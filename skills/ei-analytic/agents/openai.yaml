@@ -1,0 +1,4 @@
+interface:
+  display_name: "EI Analytic"
+  short_description: "Consulta datos industriales de EI Analytic"
+  default_prompt: "Usa $ei-analytic para consultar equipos, sensores y mediciones de EI Analytic."

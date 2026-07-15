@@ -1,0 +1,7 @@
+.env
+.env.*
+tmp/
+*.jpg
+*.jpeg
+*.png
+!skills/**/assets/*.png
