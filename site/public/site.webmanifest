@@ -1,0 +1,16 @@
+{
+  "name": "Connect to Analytics",
+  "short_name": "Analytics",
+  "description": "Agent Skill for EI Analytic industrial condition-monitoring data.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#081018",
+  "theme_color": "#081018",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
