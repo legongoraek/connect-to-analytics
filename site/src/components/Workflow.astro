@@ -1,0 +1,18 @@
+<div class="workflow" aria-label="Connect to Analytics data flow">
+  <div class="workflow-step"><strong>Natural language</strong><span class="muted">The user asks an industrial data question.</span></div>
+  <div class="workflow-arrow" aria-hidden="true">→</div>
+  <div class="workflow-step"><strong>Agent</strong><span class="muted">The agent interprets intent and resolves the hierarchy.</span></div>
+  <div class="workflow-arrow" aria-hidden="true">→</div>
+  <div class="workflow-step"><strong>EI Analytic CLI</strong><span class="muted">The documented command is executed with the required IDs and options.</span></div>
+  <div class="workflow-arrow" aria-hidden="true">→</div>
+  <div class="workflow-step"><strong>EI Analytic API</strong><span class="muted">The CLI authenticates and requests the selected data.</span></div>
+  <div class="workflow-arrow" aria-hidden="true">→</div>
+  <div class="workflow-step"><strong>Industrial data</strong><span class="muted">Normalized JSON and files return to the agent for interpretation.</span></div>
+</div>
+
+<style>
+  .workflow { grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr auto 1fr; }
+  @media (max-width: 900px) {
+    .workflow { grid-template-columns: 1fr; }
+  }
+</style>

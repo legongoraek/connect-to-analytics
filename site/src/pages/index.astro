@@ -1,0 +1,186 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import CapabilityCard from '../components/CapabilityCard.astro';
+import CodeExample from '../components/CodeExample.astro';
+import Workflow from '../components/Workflow.astro';
+import FAQ from '../components/FAQ.astro';
+import Footer from '../components/Footer.astro';
+
+const title = 'Connect to Analytics | EI Analytic Agent Skill';
+const description = 'Query EI Analytic industrial condition-monitoring data with an Agent Skill and zero-dependency Node.js CLI for hierarchy, measurements, FFT/TWF, thermal images, devices, and sensors.';
+
+const capabilities = [
+  { label: 'Hierarchy', title: 'Discover the asset tree', description: 'Resolve companies, areas, machines, measurement points, and axes before requesting data—without guessing IDs.' },
+  { label: 'Measurements', title: 'Current and historical data', description: 'Read current measurements, all-current values, historical ranges, sensor data, and extra sensor values.' },
+  { label: 'Signals', title: 'FFT and TWF signals', description: 'Retrieve FFT or TWF signal data with supported signal and frequency-unit options.' },
+  { label: 'Thermal', title: 'Thermal images', description: 'Retrieve a thermal image through the CLI, decode it to a file, and return its metadata.' },
+  { label: 'Hardware', title: 'Devices and assignments', description: 'Inspect devices, device lookups, and sensor assignments associated with monitored equipment.' },
+  { label: 'Agents', title: 'Natural-language workflow', description: 'Give an Agent Skills-compatible client a clear industrial question and let it map the request to the documented CLI commands.' },
+];
+
+const faqItems = [
+  { question: 'What is Connect to Analytics?', answer: 'Connect to Analytics is a repository containing an Agent Skill for querying EI Analytic industrial condition-monitoring data through a zero-dependency Node.js CLI.' },
+  { question: 'What industrial data can it query?', answer: 'It supports hierarchy discovery, devices, current and historical measurements, sensor data, extra values, sensor assignments, FFT/TWF signals, and thermal images.' },
+  { question: 'How are EI Analytic credentials handled?', answer: 'Credentials and tokens are read from environment variables. They are not embedded in this landing page and the browser does not authenticate to EI Analytic.' },
+  { question: 'What runtime is required?', answer: 'The existing Agent Skill requires Node.js 18 or newer. The public landing site is generated as static HTML.' },
+  { question: 'Does the website call the EI Analytic API?', answer: 'No. The website is a presentation and discovery layer. API access remains in the Agent Skill and CLI.' },
+  { question: 'Does the landing page change the CLI?', answer: 'No. The website is isolated under site/ and does not import or modify the runtime behavior of skills/ei-analytic.' },
+];
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      name: 'Connect to Analytics',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Cross-platform',
+      description,
+      softwareRequirements: 'Node.js 18 or newer',
+      codeRepository: 'https://github.com/legongoraek/connect-to-analytics',
+      url: Astro.site ? new URL('/', Astro.site).toString() : Astro.url.origin,
+    },
+    {
+      '@type': 'WebSite',
+      name: 'Connect to Analytics',
+      url: Astro.site ? new URL('/', Astro.site).toString() : Astro.url.origin,
+      description,
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faqItems.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: { '@type': 'Answer', text: item.answer },
+      })),
+    },
+  ],
+};
+---
+
+<BaseLayout {title} {description} {structuredData}>
+  <div id="top"></div>
+  <Header />
+  <main id="main-content">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">Industrial condition monitoring · Agent Skill</p>
+          <h1>Ask industrial data questions. Reach EI Analytic through an agent.</h1>
+          <p class="lead">Connect to Analytics gives Agent Skills-compatible clients a documented way to discover EI Analytic assets and query measurements, signals, thermal images, devices, and sensor assignments through a Node.js CLI.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://github.com/legongoraek/connect-to-analytics">View the repository</a>
+            <a class="button secondary" href="#install">Install the skill</a>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="Project facts">
+          <div class="kpi"><strong>Node.js 18+</strong><span class="muted">Runtime requirement</span></div>
+          <div class="kpi"><strong>Zero-dependency CLI</strong><span class="muted">The existing EI Analytic command client</span></div>
+          <div class="kpi"><strong>Static landing</strong><span class="muted">No browser-side EI Analytic API calls</span></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="problem-title">
+      <div class="container section-head">
+        <div><p class="eyebrow">Why it exists</p><h2 id="problem-title">Bridge agent questions to industrial data.</h2></div>
+        <p class="lead">EI Analytic exposes structured industrial information through its API. Connect to Analytics packages the hierarchy-resolution rules, supported commands, authentication model, and output conventions so an agent can translate a natural-language request into the correct CLI operation.</p>
+      </div>
+    </section>
+
+    <section class="section" id="capabilities" aria-labelledby="capabilities-title">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Capabilities</p><h2 id="capabilities-title">From companies and areas to signals and sensors.</h2></div>
+          <p class="lead">The public capability list mirrors the existing Agent Skill: companies, areas, machines, points, axes, devices, current and historical measurements, sensor data, extra values, assignments, FFT, TWF, and thermal images.</p>
+        </div>
+        <div class="grid">
+          {capabilities.map((item) => <CapabilityCard {...item} />)}
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="workflow" aria-labelledby="workflow-title">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Workflow</p><h2 id="workflow-title">Natural language → Agent → EI Analytic CLI → EI Analytic API → Industrial data</h2></div>
+          <p class="lead">The agent first resolves names to documented numeric IDs, then runs the narrowest command that answers the question. The CLI normalizes the service response into JSON for interpretation by the agent.</p>
+        </div>
+        <Workflow />
+      </div>
+    </section>
+
+    <section class="section" id="examples" aria-labelledby="examples-title">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Examples</p><h2 id="examples-title">Ask for the data you actually need.</h2></div>
+          <p class="lead">Examples are phrased as agent requests, but each maps to commands already documented by the existing skill.</p>
+        </div>
+        <div class="code-grid">
+          <CodeExample label="Hierarchy discovery" code={'“Show me the machines in Area 3 for the selected company, then list their measurement points and axes.”'} />
+          <CodeExample label="Historical measurement" code={'“Get the historical vibration measurements for this machine, point, and axis between July 1 and July 15.”'} />
+          <CodeExample label="FFT / TWF" code={'“Retrieve the FFT signal for this measurement file in mm/s and Hz, then summarize the dominant peaks.”'} />
+          <CodeExample label="Thermal / assignments" code={'“Download the thermal image for this machine, then show the sensor assignments associated with the monitored equipment.”'} />
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="use-cases-title">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Industrial use cases</p><h2 id="use-cases-title">Useful when context lives across hierarchy, measurements, and signals.</h2></div>
+          <p class="lead">Use the skill to accelerate data discovery for condition-monitoring reviews, historical comparisons, device inventory checks, vibration-signal inspection, thermal inspection workflows, and sensor-assignment verification.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="compatibility-title">
+      <div class="container split">
+        <article class="callout">
+          <p class="eyebrow">Agent compatibility</p>
+          <h2 id="compatibility-title">Built as an Agent Skill.</h2>
+          <p class="muted">The repository documents installation into Agent Skills-compatible environments such as Codex, Claude, Cursor, Gemini CLI, and other clients that support an equivalent skills directory.</p>
+        </article>
+        <article class="callout" id="security">
+          <p class="eyebrow">Security</p>
+          <h2>Credentials stay outside the site.</h2>
+          <p class="muted">The CLI reads EIA_EMAIL, EIA_PASSWORD, optional EIA_DATABASE, optional EIA_TOKEN, and optional EIA_BASE_URL from environment variables. This static site contains no credential values and performs no authenticated EI Analytic browser requests.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="install" aria-labelledby="install-title">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Install</p><h2 id="install-title">Add the skill to your agent environment.</h2></div>
+          <p class="lead">Use Node.js 18 or newer. Configure EI Analytic access with environment variables in your shell; never commit credentials.</p>
+        </div>
+        <div class="code-grid">
+          <CodeExample label="Skill installer" code={'npx skills add legongoraek/connect-to-analytics --skill ei-analytic'} />
+          <CodeExample label="Manual install" code={'git clone https://github.com/legongoraek/connect-to-analytics.git\ncp -r connect-to-analytics/skills/ei-analytic ~/.codex/skills/'} />
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">FAQ</p><h2 id="faq-title">Direct answers about Connect to Analytics.</h2></div>
+          <p class="lead">These answers describe the current repository and intentionally avoid claims about official affiliation, guaranteed rankings, or capabilities not implemented by the Agent Skill.</p>
+        </div>
+        <FAQ items={faqItems} />
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="cta-title">
+      <div class="container callout">
+        <p class="eyebrow">Open source</p>
+        <h2 id="cta-title">Explore the Agent Skill and CLI.</h2>
+        <p class="lead">Review the commands, API references, and installation instructions directly in the repository.</p>
+        <div class="hero-actions"><a class="button primary" href="https://github.com/legongoraek/connect-to-analytics">Open GitHub</a></div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

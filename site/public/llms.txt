@@ -1,0 +1,33 @@
+# Connect to Analytics
+
+Connect to Analytics is an open-source repository that provides an Agent Skill for querying EI Analytic industrial condition-monitoring data through a zero-dependency Node.js CLI.
+
+## What it supports
+
+- Hierarchy discovery: companies, areas, machines, measurement points, and axes
+- Devices and device lookups
+- Current and historical measurements
+- Sensor data and extra sensor values
+- Sensor assignments
+- FFT and TWF signals
+- Thermal images
+
+## Runtime
+
+Node.js 18+
+
+## Installation
+
+Agent Skills-compatible clients can install the `ei-analytic` skill from this repository. The repository README contains current installation instructions and CLI examples.
+
+## Security model
+
+Credentials are read from environment variables only: `EIA_EMAIL`, `EIA_PASSWORD`, optional `EIA_DATABASE`, optional `EIA_TOKEN`, and optional `EIA_BASE_URL`. The public website does not authenticate to EI Analytic and does not make browser-side EI Analytic API requests.
+
+## Public routes
+
+- `/` — product overview, supported capabilities, workflow, examples, security, installation, and FAQ
+
+## Source
+
+https://github.com/legongoraek/connect-to-analytics
