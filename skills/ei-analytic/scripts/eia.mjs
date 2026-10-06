@@ -12,7 +12,8 @@ const MAX_RAW_JSON_BYTES = 64 * 1024;
 const MAX_BINARY_BYTES = 64 * 1024 * 1024;
 const TRANSIENT_HTTP_STATUS = new Set([408, 429, 500, 502, 503, 504]);
 const SENSITIVE_KEY = /(?:token|password|secret|authorization|api[-_]?key|credential)/i;
-const RAW_MUTATION_PREFIX = /^(?:add|create|delete|insert|remove|save|set|update|write)/i;
+const RAW_READ_PREFIX = /^(?:get|list|read|fetch|query|search|download)/i;
+const TRUSTED_REMOTE_HOSTS = new Set(["api.eianalytic.com", "eiawswv.eianalytic.com"]);
 
 const HELP = [
   "EI Analytic CLI",
@@ -155,6 +156,11 @@ function getBaseUrl(env = process.env) {
   const localHost = ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
   if (url.protocol !== "https:" && !(url.protocol === "http:" && localHost)) {
     throw new Error("EIA_BASE_URL must use HTTPS; HTTP is allowed only for localhost");
+  }
+
+  const trustedRemote = TRUSTED_REMOTE_HOSTS.has(url.hostname.toLowerCase());
+  if (!localHost && !trustedRemote && !envEnabled(env.EIA_ALLOW_CUSTOM_HOST)) {
+    throw new Error("EIA_BASE_URL host is not trusted; set EIA_ALLOW_CUSTOM_HOST=1 only for an intentional custom host");
   }
 
   url.hash = "";
@@ -331,7 +337,7 @@ function redactText(value, env = process.env) {
 
   text = text
     .replace(/\bBearer\s+[A-Za-z0-9._~+\/-]+=*/gi, "Bearer [REDACTED]")
-    .replace(/([?&](?:token|password|secret|api[_-]?key)=)[^&\s]+/gi, "$1[REDACTED]");
+    .replace(/((?:^|[?&\s])(?:token|password|secret|api[_-]?key)=)[^&\s]+/gi, "$1[REDACTED]");
 
   return text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "");
 }
@@ -490,8 +496,8 @@ function validateRawEndpoint(endpoint, env = process.env) {
     throw new Error("raw requires a safe endpoint name");
   }
 
-  if (RAW_MUTATION_PREFIX.test(endpoint) && !envEnabled(env.EIA_ALLOW_UNSAFE_RAW)) {
-    throw new Error("Potentially state-changing raw endpoints require EIA_ALLOW_UNSAFE_RAW=1");
+  if (!RAW_READ_PREFIX.test(endpoint) && !envEnabled(env.EIA_ALLOW_UNSAFE_RAW)) {
+    throw new Error("Raw endpoints not clearly read-only require EIA_ALLOW_UNSAFE_RAW=1");
   }
 
   return endpoint;
@@ -531,6 +537,37 @@ function parseRawData(raw) {
   return data;
 }
 
+
+function assertKnownOptions(command, options) {
+  const common = new Set(["pretty", "help"]);
+  const allowed = {
+    login: [],
+    companies: [],
+    areas: ["company"],
+    machines: ["area"],
+    points: ["machine"],
+    axes: ["machine", "point"],
+    history: ["machine", "point", "axis", "start", "end", "rms"],
+    "sensor-data": ["phantom", "start", "end"],
+    units: [],
+    "extra-values": ["machine", "point", "unit", "start", "end"],
+    thermo: ["machine", "point", "file", "outputFile", "overwrite"],
+    devices: ["company", "area", "machine", "point"],
+    "devices-by-code": ["codes"],
+    current: ["company", "area", "machine", "point", "axis"],
+    "all-current": ["since"],
+    "all-devices": [],
+    assignments: ["code"],
+    fft: ["machine", "point", "file", "axis", "output", "signal", "frequency"],
+    raw: ["data"],
+  };
+
+  if (!Object.prototype.hasOwnProperty.call(allowed, command)) return;
+  const accepted = new Set([...common, ...allowed[command]]);
+  const unknown = Object.keys(options).filter(key => !accepted.has(key));
+  if (unknown.length) throw new Error("Unknown option(s) for " + command + ": " + unknown.map(key => "--" + key.replace(/[A-Z]/g, m => "-" + m.toLowerCase())).join(", "));
+}
+
 async function main(argv = process.argv.slice(2), env = process.env) {
   const { positional, options } = parseArgs(argv);
   const command = positional[0];
@@ -540,6 +577,7 @@ async function main(argv = process.argv.slice(2), env = process.env) {
     return;
   }
 
+  assertKnownOptions(command, options);
   const pretty = bool(options.pretty, false);
 
   if (command === "login") {
@@ -652,4 +690,5 @@ export {
   safeText,
   sanitizeOutput,
   validateRawEndpoint,
+  assertKnownOptions,
 };
