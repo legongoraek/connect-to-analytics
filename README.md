@@ -56,7 +56,7 @@ export EIA_DATABASE="database-name" # only needed for accounts with multiple dat
 
 You may set `EIA_TOKEN` instead of email and password when you already have a valid database token.
 
-`EIA_BASE_URL` is optional. Custom remote endpoints must use HTTPS; plain HTTP is accepted only for localhost development.
+`EIA_BASE_URL` is optional. Custom remote endpoints must use HTTPS; plain HTTP is accepted only for localhost development. By default, remote hosts are restricted to known EI Analytic service hosts. A different remote host additionally requires `EIA_ALLOW_CUSTOM_HOST=1`.
 
 Raw endpoint access is disabled by default. Enable it only for a known endpoint when a supported command does not cover the task:
 
@@ -87,7 +87,8 @@ All successful commands print JSON to stdout. Run `node skills/ei-analytic/scrip
 
 The CLI is deliberately defensive around agent-controlled inputs and remote responses:
 
-- strict integer, boolean, date, and date-range validation;
+- strict integer, boolean, date, date-range, and CLI-option validation;
+- allowlisted EI Analytic remote hosts by default, with explicit opt-in for a custom host;
 - HTTPS-only custom API endpoints except localhost;
 - 30-second request timeout and bounded retries for transient failures;
 - redirects disabled for authenticated API requests;
@@ -99,7 +100,7 @@ The CLI is deliberately defensive around agent-controlled inputs and remote resp
 - thermal image output refuses to overwrite an existing file unless `--overwrite true` is explicit;
 - FFT/TWF and thermal base64 payloads are validated before decoding.
 
-See [SECURITY.md](SECURITY.md) for vulnerability reporting and security-sensitive areas.
+See [SECURITY.md](SECURITY.md) for vulnerability reporting and security-sensitive areas. Known EI Analytic web/API surfaces, including the currently unsupported `getCustomDataCompress` endpoint, are documented in [skills/ei-analytic/references/services.md](skills/ei-analytic/references/services.md).
 
 ## Offline verification
 
