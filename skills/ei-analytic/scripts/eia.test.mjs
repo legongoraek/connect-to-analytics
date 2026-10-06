@@ -281,7 +281,7 @@ test("post retries transient HTTP errors but never follows redirects", async () 
     "GetCompanies",
     { Token: "secret" },
     {
-      env: { EIA_BASE_URL: "https://example.com/ApiWeb.svc" },
+      env: { EIA_BASE_URL: "https://api.eianalytic.com/ApiWeb.svc" },
       fetchImpl,
       retries: 1,
       timeoutMs: 1000,
@@ -291,7 +291,7 @@ test("post retries transient HTTP errors but never follows redirects", async () 
   assert.deepEqual(result, { ok: true });
   assert.equal(calls, 2);
   assert.equal(seen[0].redirect, "error");
-  assert.equal(seen[0].url, "https://example.com/ApiWeb.svc/GetCompanies");
+  assert.equal(seen[0].url, "https://api.eianalytic.com/ApiWeb.svc/GetCompanies");
 });
 
 test("post rejects oversized responses before reading the body", async () => {
@@ -305,7 +305,7 @@ test("post rejects oversized responses before reading the body", async () => {
       "GetCompanies",
       {},
       {
-        env: { EIA_BASE_URL: "https://example.com/ApiWeb.svc" },
+        env: { EIA_BASE_URL: "https://api.eianalytic.com/ApiWeb.svc" },
         fetchImpl,
         retries: 0,
       },
@@ -322,7 +322,7 @@ test("post non-JSON errors do not echo remote response bodies", async () => {
       "GetCompanies",
       {},
       {
-        env: { EIA_BASE_URL: "https://example.com/ApiWeb.svc" },
+        env: { EIA_BASE_URL: "https://api.eianalytic.com/ApiWeb.svc" },
         fetchImpl,
         retries: 0,
       },
