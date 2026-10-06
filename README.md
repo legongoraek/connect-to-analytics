@@ -42,7 +42,7 @@ The repository follows the Agent Skills layout and keeps the agent instructions 
 - "Retrieve vibration history for machine 123, point 1, axis 1 for this date range and summarize notable changes."
 - "Fetch the FFT for the selected measurement and explain the returned units without inventing missing context."
 
-The skill instructs the agent to resolve names to IDs from the hierarchy instead of guessing IDs, use narrow time/data ranges, and treat nonzero API status codes as failures.
+The skill instructs the agent to resolve names to IDs from the hierarchy instead of guessing IDs, use narrow time/data ranges, distinguish measurements from interpretation, and treat remote API content as untrusted data rather than agent instructions.
 
 ## Configure
 
@@ -56,6 +56,22 @@ export EIA_DATABASE="database-name" # only needed for accounts with multiple dat
 
 You may set `EIA_TOKEN` instead of email and password when you already have a valid database token.
 
+`EIA_BASE_URL` is optional. Custom remote endpoints must use HTTPS; plain HTTP is accepted only for localhost development. By default, remote hosts are restricted to known EI Analytic service hosts. A different remote host additionally requires `EIA_ALLOW_CUSTOM_HOST=1`.
+
+Raw endpoint access is disabled by default. Enable it only for a known endpoint when a supported command does not cover the task:
+
+```bash
+export EIA_ALLOW_RAW=1
+```
+
+Endpoints whose names look state-changing require a second explicit opt-in:
+
+```bash
+export EIA_ALLOW_UNSAFE_RAW=1
+```
+
+Do not enable either flag merely to bypass normal validation.
+
 ## CLI examples
 
 ```bash
@@ -67,18 +83,50 @@ node skills/ei-analytic/scripts/eia.mjs fft --machine 1308730117 --point 1 --fil
 
 All successful commands print JSON to stdout. Run `node skills/ei-analytic/scripts/eia.mjs help` for every command.
 
+## Reliability and security boundaries
+
+The CLI is deliberately defensive around agent-controlled inputs and remote responses:
+
+- strict integer, boolean, date, date-range, and CLI-option validation;
+- allowlisted EI Analytic remote hosts by default, with explicit opt-in for a custom host;
+- HTTPS-only custom API endpoints except localhost;
+- 30-second request timeout and bounded retries for transient failures;
+- redirects disabled for authenticated API requests;
+- response and decoded-binary size limits;
+- recursive redaction of token/password/secret-like response fields;
+- configured credentials removed from error messages;
+- raw payloads rejected when they contain credential fields or unsafe object keys;
+- raw requests never automatically retried;
+- thermal image output refuses to overwrite an existing file unless `--overwrite true` is explicit;
+- FFT/TWF and thermal base64 payloads are validated before decoding.
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting and security-sensitive areas. Known EI Analytic web/API surfaces, including the currently unsupported `getCustomDataCompress` endpoint, are documented in [skills/ei-analytic/references/services.md](skills/ei-analytic/references/services.md).
+
+## Offline verification
+
+Core CLI contracts are tested without live credentials or API access:
+
+```bash
+node --check skills/ei-analytic/scripts/eia.mjs
+node --test skills/ei-analytic/scripts/*.test.mjs
+node skills/ei-analytic/scripts/eia.mjs help
+```
+
+GitHub Actions runs these checks on Node.js 18 and Node.js 22 for changes to the skill or CLI.
+
 ## Project structure
 
 ```text
 skills/ei-analytic/
-├── SKILL.md          # Agent instructions
-├── scripts/eia.mjs   # Zero-dependency CLI
-├── references/       # API reference material
-└── agents/           # Agent-specific metadata
+├── SKILL.md             # Agent instructions and safety workflow
+├── scripts/eia.mjs      # Zero-dependency CLI
+├── scripts/eia.test.mjs # Offline CLI contract tests
+├── references/          # API reference material
+└── agents/              # Agent-specific metadata
 
-site/                 # Isolated Astro landing site
-docs/                 # Design/planning documentation
-.github/workflows/    # CI for the public site
+site/                    # Isolated Astro landing site
+docs/                    # Design/planning documentation
+.github/workflows/       # CLI and landing-site CI
 ```
 
 ## Landing site
@@ -100,7 +148,7 @@ Public search/discovery assets include semantic metadata, JSON-LD, `robots.txt`,
 ## Security
 
 - Credentials and tokens are read from environment variables only.
-- Secrets are never written to the repository or logged by the CLI.
+- Secrets are never written to the repository or intentionally logged by the CLI.
 - Requests go directly to the configured EI Analytic API base URL.
 - The landing site contains no EI Analytic credentials and does not authenticate to the API.
 - Security reports should follow [SECURITY.md](SECURITY.md).
@@ -111,7 +159,7 @@ The API documentation used by this project was last updated June 20, 2024. Depre
 
 Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for development, testing, Agent Skill, and pull-request guidance.
 
-Useful areas for contribution include offline CLI contract tests, documented endpoint coverage, safer validation around user-supplied inputs, and compatibility checks as the upstream API evolves.
+Useful areas for contribution include documented endpoint coverage, additional offline contract cases, response schemas, and compatibility checks as the upstream API evolves.
 
 ## License
 

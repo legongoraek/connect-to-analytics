@@ -1,6 +1,6 @@
 # EI Analytic API reference
 
-Source: `ApiWeb.pdf`, last updated June 20, 2024. All endpoints use POST JSON under `https://api.eianalytic.com/ApiWeb.svc/`.
+Source: `ApiWeb.pdf`, last updated June 20, 2024. All endpoints in this table use POST JSON under `https://api.eianalytic.com/ApiWeb.svc/`. Other known EI Analytic surfaces are tracked separately in [services.md](services.md); the secondary `getCustomDataCompress` contract is not assumed or exposed as a supported command.
 
 ## Status envelope
 
