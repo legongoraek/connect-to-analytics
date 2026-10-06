@@ -27,13 +27,14 @@ EIA_PASSWORD
 EIA_DATABASE          optional database Name, DBName, or Id
 EIA_TOKEN             optional existing database token; skips login
 EIA_BASE_URL          optional HTTPS API base URL
+EIA_ALLOW_CUSTOM_HOST set to 1 only for an intentional non-EI-Analytic remote host
 EIA_ALLOW_RAW         set to 1 only for explicitly needed raw endpoint access
 EIA_ALLOW_UNSAFE_RAW  set to 1 only for an explicitly intended state-changing raw endpoint
 ```
 
 Prefer `EIA_TOKEN` when provided. Otherwise the CLI logs in for each invocation and selects the only database automatically. If login returns multiple databases, require `EIA_DATABASE`.
 
-The CLI rejects credential-bearing base URLs, requires HTTPS except for localhost development, redacts sensitive output fields, and removes configured secrets from errors.
+The CLI rejects credential-bearing base URLs, requires HTTPS except for localhost development, trusts only known EI Analytic service hosts by default, redacts sensitive output fields, and removes configured secrets from errors. See [references/services.md](references/services.md) for the known service boundaries.
 
 ## Resolve hierarchy
 
