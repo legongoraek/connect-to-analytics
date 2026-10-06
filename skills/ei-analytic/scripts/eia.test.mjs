@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  assertKnownOptions,
   commandMap,
   dateRange,
   decodeFloatSeries,
@@ -29,6 +30,23 @@ test("parseArgs parses flags and rejects duplicates", () => {
   assert.throws(
     () => parseArgs(["current", "--machine", "1", "--machine", "2"]),
     /Duplicate option/,
+  );
+});
+
+
+test("known option validation rejects typos before network access", () => {
+  assert.doesNotThrow(() => assertKnownOptions("history", {
+    machine: "1",
+    point: "1",
+    axis: "1",
+    start: "2026-01-01",
+    end: "2026-01-02",
+    pretty: true,
+  }));
+
+  assert.throws(
+    () => assertKnownOptions("history", { machien: "1" }),
+    /Unknown option/,
   );
 });
 
@@ -84,7 +102,15 @@ test("base URL requires HTTPS except localhost and strips query/fragment", () =>
     "https://api.eianalytic.com/ApiWeb.svc",
   );
   assert.equal(
-    getBaseUrl({ EIA_BASE_URL: "https://example.com/api/?debug=1#x" }),
+    getBaseUrl({ EIA_BASE_URL: "https://api.eianalytic.com/ApiWeb.svc/?debug=1#x" }),
+    "https://api.eianalytic.com/ApiWeb.svc",
+  );
+  assert.equal(
+    getBaseUrl({ EIA_BASE_URL: "https://eiawswv.eianalytic.com/Service1.svc/" }),
+    "https://eiawswv.eianalytic.com/Service1.svc",
+  );
+  assert.equal(
+    getBaseUrl({ EIA_BASE_URL: "https://example.com/api", EIA_ALLOW_CUSTOM_HOST: "1" }),
     "https://example.com/api",
   );
   assert.equal(
@@ -95,6 +121,10 @@ test("base URL requires HTTPS except localhost and strips query/fragment", () =>
   assert.throws(
     () => getBaseUrl({ EIA_BASE_URL: "http://example.com/api" }),
     /must use HTTPS/,
+  );
+  assert.throws(
+    () => getBaseUrl({ EIA_BASE_URL: "https://example.com/api" }),
+    /host is not trusted/,
   );
   assert.throws(
     () => getBaseUrl({ EIA_BASE_URL: "https://user:pass@example.com/api" }),
@@ -175,7 +205,7 @@ test("redactText removes configured secrets and bearer tokens", () => {
   assert.equal(result.includes("raw-secret"), false);
 });
 
-test("raw access requires explicit opt-in and extra opt-in for mutation-like endpoints", () => {
+test("raw access requires explicit opt-in and extra opt-in unless clearly read-only", () => {
   assert.throws(
     () => validateRawEndpoint("GetExperimental", {}),
     /raw endpoint access is disabled/,
@@ -188,7 +218,11 @@ test("raw access requires explicit opt-in and extra opt-in for mutation-like end
 
   assert.throws(
     () => validateRawEndpoint("UpdateMachine", { EIA_ALLOW_RAW: "1" }),
-    /state-changing raw endpoints/,
+    /not clearly read-only/,
+  );
+  assert.equal(
+    validateRawEndpoint("getCustomDataCompress", { EIA_ALLOW_RAW: "1" }),
+    "getCustomDataCompress",
   );
 
   assert.equal(
