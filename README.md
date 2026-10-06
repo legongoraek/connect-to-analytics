@@ -1,6 +1,15 @@
 # Connect to Analytics
 
-Agent Skill for querying EI Analytic industrial condition-monitoring data in natural language. It includes a zero-dependency Node.js CLI for hierarchy discovery, devices, current and historical measurements, FFT/TWF signals, thermal images, and sensor assignments.
+Open-source Agent Skill for querying EI Analytic industrial condition-monitoring data in natural language. It includes a zero-dependency Node.js CLI for hierarchy discovery, devices, current and historical measurements, FFT/TWF signals, thermal images, and sensor assignments.
+
+- **License:** MIT
+- **Runtime:** Node.js 18+
+- **Agent Skill:** `skills/ei-analytic/SKILL.md`
+- **Public site:** https://connect-to-analytics-site.vercel.app/
+
+## Why this project exists
+
+Industrial condition-monitoring APIs expose useful machine, vibration, sensor, and thermal data, but their endpoint structure is not always convenient for agent-driven workflows. This project provides a small, inspectable integration layer that lets an Agent Skills-compatible client resolve hierarchy, call supported API operations, and return structured JSON without embedding credentials in the skill.
 
 ## Requirements
 
@@ -9,11 +18,13 @@ Agent Skill for querying EI Analytic industrial condition-monitoring data in nat
 
 ## Install
 
+Install the Agent Skill:
+
 ```bash
 npx skills add legongoraek/connect-to-analytics --skill ei-analytic
 ```
 
-For a manual installation:
+For a manual Codex installation:
 
 ```bash
 git clone https://github.com/legongoraek/connect-to-analytics.git
@@ -21,6 +32,17 @@ cp -r connect-to-analytics/skills/ei-analytic ~/.codex/skills/
 ```
 
 Use the equivalent skills directory for Claude, Cursor, Gemini CLI, or another Agent Skills-compatible client.
+
+## Use with Codex
+
+The repository follows the Agent Skills layout and keeps the agent instructions in `skills/ei-analytic/SKILL.md`. Once the skill is installed and credentials are configured, requests can stay task-oriented, for example:
+
+- "Using the EI Analytic skill, list the companies and areas available to my account."
+- "Find the measurement points for machine 123 and summarize the current readings."
+- "Retrieve vibration history for machine 123, point 1, axis 1 for this date range and summarize notable changes."
+- "Fetch the FFT for the selected measurement and explain the returned units without inventing missing context."
+
+The skill instructs the agent to resolve names to IDs from the hierarchy instead of guessing IDs, use narrow time/data ranges, and treat nonzero API status codes as failures.
 
 ## Configure
 
@@ -45,6 +67,20 @@ node skills/ei-analytic/scripts/eia.mjs fft --machine 1308730117 --point 1 --fil
 
 All successful commands print JSON to stdout. Run `node skills/ei-analytic/scripts/eia.mjs help` for every command.
 
+## Project structure
+
+```text
+skills/ei-analytic/
+├── SKILL.md          # Agent instructions
+├── scripts/eia.mjs   # Zero-dependency CLI
+├── references/       # API reference material
+└── agents/           # Agent-specific metadata
+
+site/                 # Isolated Astro landing site
+docs/                 # Design/planning documentation
+.github/workflows/    # CI for the public site
+```
+
 ## Landing site
 
 The public SEO/GEO landing page lives in `site/`. It is an isolated Astro static site and does not import the Agent Skill runtime or make browser-side EI Analytic API requests.
@@ -67,9 +103,16 @@ Public search/discovery assets include semantic metadata, JSON-LD, `robots.txt`,
 - Secrets are never written to the repository or logged by the CLI.
 - Requests go directly to the configured EI Analytic API base URL.
 - The landing site contains no EI Analytic credentials and does not authenticate to the API.
+- Security reports should follow [SECURITY.md](SECURITY.md).
 
 The API documentation used by this project was last updated June 20, 2024. Deprecated endpoints are intentionally excluded in favor of `GetAllHistoryMeasures` and `GetFFT_Base64`.
 
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for development, testing, Agent Skill, and pull-request guidance.
+
+Useful areas for contribution include offline CLI contract tests, documented endpoint coverage, safer validation around user-supplied inputs, and compatibility checks as the upstream API evolves.
+
 ## License
 
-MIT
+[MIT](LICENSE)
