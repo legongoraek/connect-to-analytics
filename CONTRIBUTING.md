@@ -75,6 +75,7 @@ Prefer offline contract tests whenever behavior can be validated without a live 
 Contributions must preserve these boundaries unless a reviewed change intentionally strengthens them:
 
 - custom remote `EIA_BASE_URL` values use HTTPS; HTTP is limited to localhost;
+- remote hosts outside the known EI Analytic service hosts require `EIA_ALLOW_CUSTOM_HOST=1`;
 - authenticated requests do not follow redirects;
 - supported read workflows use bounded retries only for transient failures;
 - `raw` is disabled unless `EIA_ALLOW_RAW=1`;
