@@ -1,0 +1,48 @@
+name: EI Analytic CLI CI
+
+on:
+  push:
+    branches:
+      - main
+      - feat/harden-ei-analytic-skill
+    paths:
+      - 'skills/ei-analytic/**'
+      - '.github/workflows/cli-ci.yml'
+  pull_request:
+    paths:
+      - 'skills/ei-analytic/**'
+      - '.github/workflows/cli-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  cli-contracts:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node:
+          - 18
+          - 22
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Syntax check
+        run: node --check skills/ei-analytic/scripts/eia.mjs
+
+      - name: Run offline contract tests
+        run: node --test skills/ei-analytic/scripts/*.test.mjs
+
+      - name: Verify help is credential-free
+        env:
+          EIA_EMAIL: ""
+          EIA_PASSWORD: ""
+          EIA_TOKEN: ""
+        run: node skills/ei-analytic/scripts/eia.mjs help
