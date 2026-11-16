@@ -37,7 +37,7 @@ const image = new URL('/favicon.svg', Astro.site ?? Astro.url.origin);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
 
-    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData).replace(/</g, "\\u003c")} />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
