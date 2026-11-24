@@ -20,5 +20,5 @@ test("sitemap and robots point at the deployed site", async () => {
   for (const file of files) {
     for (const [, loc] of (await dist(file)).matchAll(/<loc>([^<]+)<\/loc>/g)) assert.ok(loc.startsWith(SITE), `${file}: ${loc}`);
   }
-  assert.match(await dist("robots.txt"), new RegExp(`Sitemap: ${SITE.replace(/[.]/g, "\.")}sitemap-index\.xml`));
+  assert.match(await dist("robots.txt"), new RegExp(`Sitemap: ${SITE.replace(/[.]/g, "\\.")}sitemap-index\\.xml`));
 });
