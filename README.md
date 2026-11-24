@@ -141,7 +141,7 @@ npm test
 npm run build
 ```
 
-The site uses Astro 5 so it remains compatible with Node.js 18+. Set `PUBLIC_SITE_URL` to the production origin before building when the site is deployed somewhere other than the configured fallback URL; Astro uses it for canonical URLs and sitemap generation.
+The site uses Astro 7 (Node.js 22.12+). Set `PUBLIC_SITE_URL` to the production origin before building when the site is deployed somewhere other than the fallback (`https://connect-to-analytics-site.vercel.app/`); Astro uses it for canonical URLs and sitemap generation.
 
 Public search/discovery assets include semantic metadata, JSON-LD, `robots.txt`, sitemap generation, and `llms.txt`.
 

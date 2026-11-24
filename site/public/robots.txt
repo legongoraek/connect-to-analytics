@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://legongoraek.github.io/connect-to-analytics/sitemap-index.xml
+Sitemap: https://connect-to-analytics-site.vercel.app/sitemap-index.xml
