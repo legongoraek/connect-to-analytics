@@ -39,12 +39,12 @@ const structuredData = {
       description,
       softwareRequirements: 'Node.js 18 or newer',
       codeRepository: 'https://github.com/legongoraek/connect-to-analytics',
-      url: Astro.site ? new URL('/', Astro.site).toString() : Astro.url.origin,
+      url: Astro.site ? new URL(Astro.site).toString() : Astro.url.origin,
     },
     {
       '@type': 'WebSite',
       name: 'Connect to Analytics',
-      url: Astro.site ? new URL('/', Astro.site).toString() : Astro.url.origin,
+      url: Astro.site ? new URL(Astro.site).toString() : Astro.url.origin,
       description,
     },
     {

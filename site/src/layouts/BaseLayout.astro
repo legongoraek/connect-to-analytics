@@ -8,8 +8,8 @@ interface Props {
 }
 
 const { title, description, structuredData = [] } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
-const image = new URL('/favicon.svg', Astro.site ?? Astro.url.origin);
+const canonical = new URL(Astro.url.pathname.replace(/^\//, ''), Astro.site ?? Astro.url.origin);
+const image = new URL('favicon.svg', Astro.site ?? Astro.url.origin);
 ---
 
 <!doctype html>
